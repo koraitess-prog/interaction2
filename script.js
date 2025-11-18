@@ -1,21 +1,27 @@
-// script.js - קוד סופי: 4 אובייקטים, מסך סיכום נקי, ומחזיר את Typewriter
+// script.js - קוד סופי: 4 אובייקטים, Typewriter ב-Main View וב-Summary, מיפוי קבצים נכון
 
-const NUM_OBJECTS = 4; // רק 4 אובייקטים
-const TOTAL_VIEWS = NUM_OBJECTS + 1; 
+const NUM_OBJECTS = 4; // 4 אובייקטים
+const TOTAL_VIEWS = NUM_OBJECTS + 1; // 4 אובייקטים + 1 סיכום
 let currentViewIndex = 0; 
 let currentImageIndex = 0; 
-let typingTimeout; // 🚨 הוגדר מחדש לצורך Typewriter
+let typingTimeout; // טיימר לטקסט ב-Main View
+let summaryTypingTimeout; // טיימר לטקסט ב-Summary View
 
-// נתונים
-const FILE_INDICES = [0, 1, 2, 3]; 
-const OBJECT_LABELS = [
-    "OBJECT 0: OLIVE TREE (WOOD)",     
-    "OBJECT 1: EARTH (MODEL)",    
-    "OBJECT 2: CANDLE (WAX)",     
-    "OBJECT 3: HUMAN (SUBJECT)"     
+// 🚨 המיפוי הסופי והמדויק 🚨
+const FILE_INDICES = [
+    0, // שורה 1 (עץ) משתמשת ב-object0
+    1, // שורה 2 (כדור הארץ) משתמשת ב-object1
+    3, // שורה 3 (אדם) משתמשת ב-object3
+    2  // שורה 4 (נר) משתמשת ב-object2
 ];
 
-// הוספתי תיאור ארוך ומפורט יותר כדי שהאפקט ייראה טוב יותר
+const OBJECT_LABELS = [
+    "OBJECT 0: OLIVE TREE (WOOD)",     
+    "OBJECT 1: EARTH (MODEL)", 
+    "OBJECT 2: HUMAN (SUBJECT)",     
+    "OBJECT 3: CANDLE (WAX)"
+];
+
 const STATE_DATA = [
     { 
         label: "CLEAN (Baseline)", time: "0 Years", fileSuffix: "clean", 
@@ -35,14 +41,45 @@ const STATE_DATA = [
     }
 ];
 
+const SCIENTIFIC_SUMMARY_TEXT = `
+[DECAY ANALYSIS PROTOCOL - FINAL REPORT]
+
+The decay array test successfully mapped the corrosion lifecycle across four distinct material categories (Wood, Model, Human, Wax).
+
+**Oxidation & Rust Phases:**
+Rust is the common term for iron oxide (Fe2O3), formed when iron reacts with oxygen and water. While the objects in this array represent varied base materials, the 'Rust' stages are used as a proxy for generalized material degradation due to exposure.
+
+**PHASE I: CLEAN (Baseline)**
+Oxidation Percentage: 0.0%
+Structural Integrity: 100%
+Characteristics: All objects maintained original spectral data. No measurable texture or molecular degradation.
+
+**PHASE II: RUST-1 (Early Stage)**
+Oxidation Percentage: 15-35%
+Structural Integrity: 95%
+Characteristics: Onset of molecular breakdown. Initial color shift is detectable, primarily in the UV spectrum. Surface corrosion is localized and highly dependent on material composition.
+
+**PHASE III: RUST-2 (Advanced Corrosion)**
+Oxidation Percentage: 35-75%
+Structural Integrity: 70%
+Characteristics: Advanced exposure leading to deep pigment loss and physical deformation. Decay penetrates the secondary structural layer, visible as blurring and erosion of fine details. Factor increase correlates directly with environmental temperature instability.
+
+**PHASE IV: RUST-3 (Maximum Decay)**
+Oxidation Percentage: 75-100%
+Structural Integrity: <50%
+Characteristics: Critical structural failure. Complete loss of original color profile. Exposed internal material structure. Total integrity compromised, representing the end-state of the observed decay cycle.
+`;
+
+
 // ------------------------------------------
 // 1. UTILITY FUNCTIONS
 // ------------------------------------------
 
-// 🚨 פונקציית Typewriter חוזרת 🚨
-function typewriterEffect(element, text, speed) {
-    if (typingTimeout) {
-        clearTimeout(typingTimeout);
+function typewriterEffect(element, text, speed, timerRef) {
+    if (timerRef === 'main') {
+        if (typingTimeout) clearTimeout(typingTimeout);
+    } else if (timerRef === 'summary') {
+        if (summaryTypingTimeout) clearTimeout(summaryTypingTimeout);
     }
     
     let i = 0;
@@ -52,7 +89,12 @@ function typewriterEffect(element, text, speed) {
         if (i < text.length) {
             element.innerHTML += text.charAt(i);
             i++;
-            typingTimeout = setTimeout(type, speed); 
+            let timeoutID = setTimeout(type, speed); 
+            if (timerRef === 'main') {
+                typingTimeout = timeoutID;
+            } else if (timerRef === 'summary') {
+                summaryTypingTimeout = timeoutID;
+            }
         }
     }
     type();
@@ -65,7 +107,7 @@ function getFileName(objIndex, stateIndex) {
 }
 
 // ------------------------------------------
-// 2. MAIN VIEW FUNCTIONS
+// 2. MAIN VIEW FUNCTIONS 
 // ------------------------------------------
 
 function updateMainDisplay(objIndex, stateIndex) {
@@ -76,10 +118,9 @@ function updateMainDisplay(objIndex, stateIndex) {
 
     currentImageIndex = stateIndex;
     
-    // 1. טעינת תמונה ראשית
-    mainImage.src = getFileName(objIndex, stateIndex);
+    // שימוש ב-getFileName עם שמות הקבצים המדויקים
+    mainImage.src = getFileName(objIndex, stateIndex); 
     
-    // 2. הכנת אזור הטקסט
     researchTextElement.innerHTML = `
         <strong>[OBJECT DATA LOG] - ${objectLabel}</strong>
         <p>
@@ -89,11 +130,9 @@ function updateMainDisplay(objIndex, stateIndex) {
         <div id="typewriter-output" style="color: #999; font-size: 0.9em;"></div>
     `;
 
-    // 🚨 3. הפעלת Typewriter על התיאור הארוך 🚨
     const typewriterOutput = document.getElementById('typewriter-output');
-    typewriterEffect(typewriterOutput, data.description, 15); 
+    typewriterEffect(typewriterOutput, data.description, 15, 'main'); 
     
-    // 4. הדגשת התמונה הנכונה בסיידבאר
     document.querySelectorAll('.thumb-item').forEach(item => {
         item.classList.remove('active');
     });
@@ -129,7 +168,7 @@ function buildSidebar(objIndex) {
 
 
 // ------------------------------------------
-// 3. SUMMARY VIEW FUNCTIONS (4x4 תמונות בלבד)
+// 3. SUMMARY VIEW FUNCTIONS
 // ------------------------------------------
 
 function buildSummaryGrid() {
@@ -153,6 +192,9 @@ function buildSummaryGrid() {
     });
     
     grid.innerHTML = summaryHTML;
+    
+    const summaryTextElement = document.getElementById('summary-info-text');
+    typewriterEffect(summaryTextElement, SCIENTIFIC_SUMMARY_TEXT.trim(), 15, 'summary');
 }
 
 // ------------------------------------------
@@ -164,6 +206,7 @@ function toggleView(index) {
     const summaryView = document.getElementById('summary-view-container');
 
     if (index < NUM_OBJECTS) {
+        if (summaryTypingTimeout) clearTimeout(summaryTypingTimeout);
         normalView.classList.remove('hidden');
         summaryView.classList.add('hidden');
         cycleToObject(index);
