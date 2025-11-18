@@ -1,0 +1,186 @@
+/* ------------------- CSS GENERAL & MAIN STRUCTURE ------------------- */
+body {
+    background-color: #000;
+    color: #FFF;
+    margin: 0;
+    font-family: monospace; 
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ------------------- VISIBILITY MANAGEMENT ------------------- */
+.hidden {
+    display: none !important; 
+}
+.active {
+    display: flex; 
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* ------------------- NORMAL VIEW (3/4 vs 1/4 SPLIT) ------------------- */
+#main-view-container {
+    display: flex;
+    width: 98vw; 
+    height: 98vh; 
+    gap: 5px; 
+    padding: 5px; 
+    box-sizing: border-box; 
+}
+
+#main-left-panel {
+    flex-basis: 75%; 
+    display: flex;
+    flex-direction: column;
+    gap: 5px; 
+    padding: 0; 
+    border: 1px solid #333; 
+}
+
+#main-display {
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px; 
+}
+/* ... (שאר הכללים של Normal View ו-Sidebar נשארים זהים) ... */
+#main-image-wrapper {
+    width: 100%;
+    height: calc(100% - 135px); 
+    flex-grow: 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 0; 
+}
+
+#main-image {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+#research-text {
+    width: 100%;
+    height: 120px; 
+    font-size: 0.8em;
+    color: #999;
+    padding: 5px 10px; 
+    text-align: left; 
+    border-top: 1px solid #333;
+}
+
+#research-text strong {
+    color: #FFF;
+    display: block;
+    margin-bottom: 5px; 
+    font-size: 1em;
+}
+
+#research-text p {
+    margin: 3px 0; 
+}
+
+#sidebar {
+    flex-basis: 25%; 
+    display: flex;
+    flex-direction: column;
+    gap: 2px; 
+    padding: 2px; 
+    overflow: hidden; 
+    border: 1px solid #333;
+}
+
+.thumb-item {
+    flex-basis: 0; 
+    flex-grow: 1; 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    width: 100%; 
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s, transform 0.2s;
+    background-color: #111;
+}
+
+.thumb-item.active {
+    border-color: #00FF00; 
+}
+
+.thumb-item img {
+    max-width: 98%; 
+    max-height: 98%; 
+    object-fit: contain;
+    display: block;
+}
+
+
+/* ------------------- SUMMARY VIEW (4x4 PURE IMAGES) ------------------- */
+
+#summary-view-container {
+    width: 98vw;
+    height: 98vh;
+    padding: 20px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center; /* ממקם את ה-Grid במרכז המסך */
+    overflow: hidden; 
+}
+
+/* 🚨 הסרת כותרת ה-h2 (FINAL DECAY ANALYSIS SUMMARY) 🚨 */
+#summary-view-container h2 {
+    display: none; 
+}
+
+#summary-grid {
+    display: grid;
+    /* 🚨 4 עמודות שוות (מצבים) 🚨 */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 0;
+    
+    /* 🚨 4 שורות שוות (אובייקטים) 🚨 */
+    grid-template-rows: repeat(4, 1fr); 
+    width: 90%; /* כדי לאפשר למסך להתאים בצורה יפה יותר */
+    height: 90%;
+    background-color: #000;
+}
+
+/* 🚨 מוסר לחלוטין - אין כותרות ב-Grid 🚨 */
+.summary-row-header {
+    display: none;
+}
+
+.summary-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none; 
+    background-color: #000; 
+}
+
+/* תא האובייקט (התמונות) */
+.summary-image-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* אם רוצים מרווח קטן בין תמונה לתמונה */
+    padding: 5px; 
+}
+
+.summary-image-wrapper img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+}
